@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NOIR CHESS</title>
+  <meta name="description" content="Cinematic, editorial chess application. Real playable chess with physical piece aesthetics, tactile animation, and grandmaster-level engine.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="noir">
+
+  <!-- ============================================== -->
+  <!-- HIGH-CONTRAST VECTOR CHESS PIECES (STAUNTON)   -->
+  <!-- ============================================== -->
+  <svg style="display: none;" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- White Piece Gradients: Solid Ivory Alabaster -->
+      <linearGradient id="wPieceGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="45%" stop-color="#faf6ed"/>
+        <stop offset="85%" stop-color="#ebe2cf"/>
+        <stop offset="100%" stop-color="#d8cdb6"/>
+      </linearGradient>
+
+      <!-- Black Piece Gradients: Deep Charcoal Obsidian -->
+      <linearGradient id="bPieceGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+        <stop offset="0%" stop-color="#363940"/>
+        <stop offset="35%" stop-color="#212226"/>
+        <stop offset="80%" stop-color="#141518"/>
+        <stop offset="100%" stop-color="#0a0a0d"/>
+      </linearGradient>
+
+      <!-- WHITE KING -->
+      <g id="piece-w-k">
+        <path d="M11 39h23v-3.5c0-1.5-1.5-2.5-3-2.5H14c-1.5 0-3 1-3 2.5V39z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M14 33c0-3.5 1.5-6.5 3.5-10h10c2 3.5 3.5 6.5 3.5 10H14z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M17.5 23c-2.5-2-4.5-4.5-4.5-7.5 0-3.5 2.5-5.5 5.5-5.5 1.5 0 2.5.5 4 1.5 1.5-1 2.5-1.5 4-1.5 3 0 5.5 2 5.5 5.5 0 3-2 5.5-4.5 7.5H17.5z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M22.5 5.5v5.5M19.5 8h6" stroke="#1a1917" stroke-width="2.2" stroke-linecap="square"/>
+        <path d="M14 36.5h17M15.5 33h14" stroke="#8a7e6b" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="22.5" cy="16" r="1.8" fill="#c5a059" stroke="#1a1917" stroke-width="1"/>
+      </g>
+
+      <!-- WHITE QUEEN -->
+      <g id="piece-w-q">
+        <path d="M11 39h23v-3.5c0-1.5-1.5-2.5-3-2.5H14c-1.5 0-3 1-3 2.5V39z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M13.5 33c0-2.5 1.5-4 2.5-6h13c1 2 2.5 3.5 2.5 6H13.5z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8"/>
+        <path d="M9 25l2.5-13.5 6 7 5-11 5 11 6-7 2.5 13.5H9z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8" stroke-linejoin="round"/>
+        <circle cx="9" cy="11.5" r="1.8" fill="#ffffff" stroke="#1a1917" stroke-width="1.2"/>
+        <circle cx="17.5" cy="8.5" r="1.8" fill="#ffffff" stroke="#1a1917" stroke-width="1.2"/>
+        <circle cx="22.5" cy="7.5" r="1.8" fill="#c5a059" stroke="#1a1917" stroke-width="1.2"/>
+        <circle cx="27.5" cy="8.5" r="1.8" fill="#ffffff" stroke="#1a1917" stroke-width="1.2"/>
+        <circle cx="36" cy="11.5" r="1.8" fill="#ffffff" stroke="#1a1917" stroke-width="1.2"/>
+        <path d="M12 36.5h21M14 33h17" stroke="#8a7e6b" stroke-width="1.2"/>
+      </g>
+
+      <!-- WHITE ROOK -->
+      <g id="piece-w-r">
+        <path d="M10 39h25v-4H10v4z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8"/>
+        <path d="M13 35v-4h19v4H13z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8"/>
+        <path d="M14.5 31c0-4 1.5-6.5 2.5-10.5h11c1 4 2.5 6.5 2.5 10.5H14.5z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8"/>
+        <path d="M12 20.5h21V15h-3.5v2.5h-4.5V15h-5v2.5h-4.5V15H12v5.5z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M11 35h23M13 31h19M12 20.5h21" stroke="#8a7e6b" stroke-width="1.2"/>
+      </g>
+
+      <!-- WHITE BISHOP -->
+      <g id="piece-w-b">
+        <path d="M11 39h23v-3.5c0-1.5-1.5-2.5-3-2.5H14c-1.5 0-3 1-3 2.5V39z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8"/>
+        <path d="M14.5 33c0-3.5 1.5-6 3.5-9h9c2 3 3.5 5.5 3.5 9H14.5z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8"/>
+        <path d="M17.5 24c-1-3 0-9 5-14 5 5 6 11 5 14H17.5z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8"/>
+        <path d="M21 16l4 4m-4 0l4-4" stroke="#1a1917" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="22.5" cy="8" r="1.8" fill="#c5a059" stroke="#1a1917" stroke-width="1.2"/>
+        <path d="M14 36.5h17M15 33h15" stroke="#8a7e6b" stroke-width="1.2"/>
+      </g>
+
+      <!-- WHITE KNIGHT -->
+      <g id="piece-w-n">
+        <path d="M22 9c-3.5 0-7 2-8.5 5-1 2-1.5 4.5-3 5.5-2 1.5-3.5 1.5-3.5 4 0 2 2 3.5 4.5 3 1.5-.5 3-1.5 4.5-1.5.5 1.5 1 3.5 1 5.5H11c-2 0-3 1.5-3 3.5h28c0-2-1-3.5-3-3.5h-3c0-3.5 1.5-7 3.5-10 1.5-2.5 1-6-1-8-1.5-1.5-4-2-6-2z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8" stroke-linejoin="round"/>
+        <circle cx="15.5" cy="17.5" r="1.5" fill="#1a1917"/>
+        <path d="M11 35.5h22" stroke="#8a7e6b" stroke-width="1.2"/>
+        <path d="M18 24.5c1.5 0 3-1 4-2" stroke="#8a7e6b" stroke-width="1.2" stroke-linecap="round"/>
+      </g>
+
+      <!-- WHITE PAWN -->
+      <g id="piece-w-p">
+        <path d="M12 39h21v-3.5c0-1.5-1.5-2.5-3-2.5H15c-1.5 0-3 1-3 2.5V39z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8"/>
+        <path d="M15 33h15v4H15z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8"/>
+        <path d="M16 29c0-3.5 2-6 3.5-8.5h6c1.5 2.5 3.5 5 3.5 8.5H16z" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8"/>
+        <circle cx="22.5" cy="14" r="5.5" fill="url(#wPieceGrad)" stroke="#1a1917" stroke-width="1.8"/>
+        <path d="M14 36h17M16 33h13" stroke="#8a7e6b" stroke-width="1.2"/>
+      </g>
+
+      <!-- BLACK KING -->
+      <g id="piece-b-k">
+        <path d="M11 39h23v-3.5c0-1.5-1.5-2.5-3-2.5H14c-1.5 0-3 1-3 2.5V39z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M14 33c0-3.5 1.5-6.5 3.5-10h10c2 3.5 3.5 6.5 3.5 10H14z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M17.5 23c-2.5-2-4.5-4.5-4.5-7.5 0-3.5 2.5-5.5 5.5-5.5 1.5 0 2.5.5 4 1.5 1.5-1 2.5-1.5 4-1.5 3 0 5.5 2 5.5 5.5 0 3-2 5.5-4.5 7.5H17.5z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M22.5 5.5v5.5M19.5 8h6" stroke="#c5a059" stroke-width="2.2" stroke-linecap="square"/>
+        <path d="M14 36.5h17M15.5 33h14" stroke="#686e7c" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="22.5" cy="16" r="1.8" fill="#c5a059" stroke="#060608" stroke-width="1"/>
+      </g>
+
+      <!-- BLACK QUEEN -->
+      <g id="piece-b-q">
+        <path d="M11 39h23v-3.5c0-1.5-1.5-2.5-3-2.5H14c-1.5 0-3 1-3 2.5V39z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M13.5 33c0-2.5 1.5-4 2.5-6h13c1 2 2.5 3.5 2.5 6H13.5z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8"/>
+        <path d="M9 25l2.5-13.5 6 7 5-11 5 11 6-7 2.5 13.5H9z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8" stroke-linejoin="round"/>
+        <circle cx="9" cy="11.5" r="1.8" fill="#c5a059" stroke="#060608" stroke-width="1.2"/>
+        <circle cx="17.5" cy="8.5" r="1.8" fill="#c5a059" stroke="#060608" stroke-width="1.2"/>
+        <circle cx="22.5" cy="7.5" r="1.8" fill="#f5d77f" stroke="#060608" stroke-width="1.2"/>
+        <circle cx="27.5" cy="8.5" r="1.8" fill="#c5a059" stroke="#060608" stroke-width="1.2"/>
+        <circle cx="36" cy="11.5" r="1.8" fill="#c5a059" stroke="#060608" stroke-width="1.2"/>
+        <path d="M12 36.5h21M14 33h17" stroke="#686e7c" stroke-width="1.2"/>
+      </g>
+
+      <!-- BLACK ROOK -->
+      <g id="piece-b-r">
+        <path d="M10 39h25v-4H10v4z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8"/>
+        <path d="M13 35v-4h19v4H13z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8"/>
+        <path d="M14.5 31c0-4 1.5-6.5 2.5-10.5h11c1 4 2.5 6.5 2.5 10.5H14.5z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8"/>
+        <path d="M12 20.5h21V15h-3.5v2.5h-4.5V15h-5v2.5h-4.5V15H12v5.5z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M11 35h23M13 31h19M12 20.5h21" stroke="#686e7c" stroke-width="1.2"/>
+      </g>
+
+      <!-- BLACK BISHOP -->
+      <g id="piece-b-b">
+        <path d="M11 39h23v-3.5c0-1.5-1.5-2.5-3-2.5H14c-1.5 0-3 1-3 2.5V39z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8"/>
+        <path d="M14.5 33c0-3.5 1.5-6 3.5-9h9c2 3 3.5 5.5 3.5 9H14.5z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8"/>
+        <path d="M17.5 24c-1-3 0-9 5-14 5 5 6 11 5 14H17.5z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8"/>
+        <path d="M21 16l4 4m-4 0l4-4" stroke="#c5a059" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="22.5" cy="8" r="1.8" fill="#c5a059" stroke="#060608" stroke-width="1.2"/>
+        <path d="M14 36.5h17M15 33h15" stroke="#686e7c" stroke-width="1.2"/>
+      </g>
+
+      <!-- BLACK KNIGHT -->
+      <g id="piece-b-n">
+        <path d="M22 9c-3.5 0-7 2-8.5 5-1 2-1.5 4.5-3 5.5-2 1.5-3.5 1.5-3.5 4 0 2 2 3.5 4.5 3 1.5-.5 3-1.5 4.5-1.5.5 1.5 1 3.5 1 5.5H11c-2 0-3 1.5-3 3.5h28c0-2-1.5-3.5-3-3.5h-3c0-3.5 1.5-7 3.5-10 1.5-2.5 1-6-1-8-1.5-1.5-4-2-6-2z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8" stroke-linejoin="round"/>
+        <circle cx="15.5" cy="17.5" r="1.5" fill="#f5d77f"/>
+        <path d="M11 35.5h22" stroke="#686e7c" stroke-width="1.2"/>
+        <path d="M18 24.5c1.5 0 3-1 4-2" stroke="#686e7c" stroke-width="1.2" stroke-linecap="round"/>
+      </g>
+
+      <!-- BLACK PAWN -->
+      <g id="piece-b-p">
+        <path d="M12 39h21v-3.5c0-1.5-1.5-2.5-3-2.5H15c-1.5 0-3 1-3 2.5V39z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8"/>
+        <path d="M15 33h15v4H15z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8"/>
+        <path d="M16 29c0-3.5 2-6 3.5-8.5h6c1.5 2.5 3.5 5 3.5 8.5H16z" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8"/>
+        <circle cx="22.5" cy="14" r="5.5" fill="url(#bPieceGrad)" stroke="#060608" stroke-width="1.8"/>
+        <path d="M14 36h17M16 33h13" stroke="#686e7c" stroke-width="1.2"/>
+      </g>
+    </defs>
+  </svg>
+
+  <!-- ============================================== -->
+  <!-- 1. ENTRY ANIMATION: WHITE KING CINEMATIC REVEAL -->
+  <!-- ============================================== -->
+  <div id="intro-screen" class="intro-screen" aria-hidden="true">
+    <div class="intro-inner">
+      <div class="hero-king-wrapper" id="hero-king-wrapper">
+        <svg class="hero-king-svg" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="kingSpecular" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+              <stop offset="25%" stop-color="#f8f4ec" stop-opacity="0.8"/>
+              <stop offset="65%" stop-color="#ded5c0" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#ad9f85" stop-opacity="0.2"/>
+            </radialGradient>
+            <linearGradient id="kingIvoryBody" x1="20%" y1="0%" x2="80%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="25%" stop-color="#fdfbf7"/>
+              <stop offset="55%" stop-color="#ece4d4"/>
+              <stop offset="85%" stop-color="#d4c7b0"/>
+              <stop offset="100%" stop-color="#ab9c83"/>
+            </linearGradient>
+            <linearGradient id="kingGoldFoil" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#e8c36a"/>
+              <stop offset="50%" stop-color="#fff0be"/>
+              <stop offset="100%" stop-color="#ba9237"/>
+            </linearGradient>
+            <filter id="heroShadow" x="-30%" y="-20%" width="160%" height="150%">
+              <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#000000" flood-opacity="0.85"/>
+              <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.6"/>
+            </filter>
+          </defs>
+
+          <ellipse cx="50" cy="120" rx="36" ry="6" fill="#000000" opacity="0.6" filter="blur(4px)"/>
+
+          <g filter="url(#heroShadow)">
+            <path d="M18 116 C 18 113, 24 110, 50 110 C 76 110, 82 113, 82 116 L 85 120 C 85 123, 76 125, 50 125 C 24 125, 15 123, 15 120 Z" fill="url(#kingIvoryBody)"/>
+            <path d="M22 108 C 22 105, 28 103, 50 103 C 72 103, 78 105, 78 108 L 81 112 C 81 114, 73 116, 50 116 C 27 116, 19 114, 19 112 Z" fill="url(#kingIvoryBody)"/>
+            <ellipse cx="50" cy="103" rx="28" ry="3.5" fill="url(#kingGoldFoil)" opacity="0.75"/>
+            <path d="M27 103 C 32 80, 36 65, 36 50 C 36 46, 42 45, 50 45 C 58 45, 64 46, 64 50 C 64 65, 68 80, 73 103 Z" fill="url(#kingIvoryBody)"/>
+            <path d="M38 52 C 37 68, 33 82, 30 100 C 36 101, 46 102, 50 102 C 43 85, 41 68, 41 52 Z" fill="url(#kingSpecular)" opacity="0.65"/>
+            <path d="M33 46 C 33 43, 38 41, 50 41 C 62 41, 67 43, 67 46 C 67 49, 62 51, 50 51 C 38 51, 33 49, 33 46 Z" fill="url(#kingIvoryBody)"/>
+            <ellipse cx="50" cy="46" rx="17" ry="2.5" fill="none" stroke="url(#kingGoldFoil)" stroke-width="1.2"/>
+            <path d="M32 42 C 26 35, 23 25, 35 18 C 42 24, 46 29, 50 36 C 54 29, 58 24, 65 18 C 77 25, 74 35, 68 42 Z" fill="url(#kingIvoryBody)"/>
+            <path d="M47 8 L 53 8 L 53 11 L 56 11 L 56 16 L 53 16 L 53 23 L 47 23 L 47 16 L 44 16 L 44 11 L 47 11 Z" fill="url(#kingIvoryBody)"/>
+            <path d="M48 9.5 L 52 9.5 L 52 12 L 54.5 12 L 54.5 15 L 52 15 L 52 21.5 L 48 21.5 L 48 15 L 45.5 15 L 45.5 12 L 48 12 Z" fill="url(#kingGoldFoil)"/>
+            <circle cx="35" cy="18" r="2.5" fill="url(#kingGoldFoil)"/>
+            <circle cx="65" cy="18" r="2.5" fill="url(#kingGoldFoil)"/>
+            <circle cx="50" cy="27" r="3" fill="url(#kingGoldFoil)"/>
+            <circle cx="50" cy="27" r="1.5" fill="#ffffff"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="intro-titles" id="intro-titles">
+        <span class="intro-kicker">NOIR CHESS</span>
+        <h1 class="intro-headline">THE GAME BEGINS.</h1>
+        <div class="intro-notation">1. e4</div>
+      </div>
+
+      <div class="intro-skip-hint">Click anywhere or press Esc to enter</div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 2. MAIN APPLICATION SHELL                      -->
+  <!-- ============================================== -->
+  <div class="noir-app" id="noir-app">
+
+    <!-- TOP NAVIGATION -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-crest">
+          <svg width="18" height="18" viewBox="0 0 45 45"><use href="#piece-w-k"/></svg>
+        </div>
+        <div class="brand-title-wrap">
+          <span class="brand-name">NOIR CHESS</span>
+        </div>
+      </div>
+
+      <!-- Small contextual status above board -->
+      <div class="header-status">
+        <span class="status-indicator-dot" id="header-status-dot"></span>
+        <span class="status-label-text" id="header-status-text">WHITE TO MOVE</span>
+      </div>
+
+      <div class="header-controls">
+        <button id="btn-sound" class="text-nav-btn" title="Toggle Sound (M)">
+          <span id="sound-label">SOUND: ON</span>
+        </button>
+        <button id="btn-theme" class="text-nav-btn" title="Board Theme">
+          <span id="current-theme-label">THEME: NOIR</span>
+        </button>
+        <button id="btn-past-games" class="text-nav-btn" title="Match Archive">
+          <span>RECORDS</span>
+        </button>
+        <button id="btn-shortcuts" class="text-nav-btn" title="Shortcuts (Esc)">
+          <span>KEYS</span>
+        </button>
+        <button id="btn-new-game-top" class="primary-nav-btn" title="Start New Match (N)">
+          <span>NEW GAME</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============================================== -->
+    <!-- 3. ARENA: BOARD (HERO) + COMPACT SIDEBAR       -->
+    <!-- ============================================== -->
+    <main class="editorial-arena">
+
+      <!-- LEFT COLUMN: CHESSBOARD (HERO ~60%) -->
+      <section class="board-column">
+
+        <!-- TOP PLAYER STRIP (BLACK BY DEFAULT) -->
+        <div class="player-strip" id="top-player-strip">
+          <div class="strip-left">
+            <div class="piece-indicator-pill" id="top-piece-pill">
+              <svg width="20" height="20" viewBox="0 0 45 45"><use id="top-piece-svg" href="#piece-b-k"/></svg>
+            </div>
+            <div class="strip-meta">
+              <div class="strip-name-row">
+                <span class="strip-name" id="top-name">COMPUTER</span>
+                <span class="strip-color-tag" id="top-color-tag">BLACK</span>
+                <span class="ai-thinking-tag hidden" id="top-thinking-tag">THINKING…</span>
+              </div>
+              <div class="strip-material-row">
+                <span class="material-tally">SCORE: <strong id="top-score-num">39</strong></span>
+                <span class="material-advantage-tag hidden" id="top-adv-tag"></span>
+                <div class="strip-captured-pieces" id="top-captured-pieces"></div>
+              </div>
+            </div>
+          </div>
+          <div class="strip-right">
+            <div class="digital-timer" id="top-clock" aria-label="Top Clock">
+              <span id="top-clock-digits">10:00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- THE 8x8 CHESSBOARD STAGE -->
+        <div class="board-viewport">
+          <div class="board-container" id="board-container">
+            <div class="board-grid" id="chessboard" role="grid" aria-label="Noir Chess Board">
+              <!-- 64 Squares injected dynamically by JS -->
+            </div>
+
+            <!-- IN-BOARD FLOATING PROMOTION PICKER (Near promotion square) -->
+            <div class="inline-promotion-popup hidden" id="inline-promotion" role="dialog" aria-label="Pawn Promotion">
+              <button class="inline-promo-btn" data-promo="q" aria-label="Queen" title="Queen">
+                <svg viewBox="0 0 45 45"><use id="inline-svg-q" href="#piece-w-q"/></svg>
+              </button>
+              <button class="inline-promo-btn" data-promo="r" aria-label="Rook" title="Rook">
+                <svg viewBox="0 0 45 45"><use id="inline-svg-r" href="#piece-w-r"/></svg>
+              </button>
+              <button class="inline-promo-btn" data-promo="b" aria-label="Bishop" title="Bishop">
+                <svg viewBox="0 0 45 45"><use id="inline-svg-b" href="#piece-w-b"/></svg>
+              </button>
+              <button class="inline-promo-btn" data-promo="n" aria-label="Knight" title="Knight">
+                <svg viewBox="0 0 45 45"><use id="inline-svg-n" href="#piece-w-n"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM PLAYER STRIP (WHITE BY DEFAULT) -->
+        <div class="player-strip" id="bottom-player-strip">
+          <div class="strip-left">
+            <div class="piece-indicator-pill" id="bottom-piece-pill">
+              <svg width="20" height="20" viewBox="0 0 45 45"><use id="bottom-piece-svg" href="#piece-w-k"/></svg>
+            </div>
+            <div class="strip-meta">
+              <div class="strip-name-row">
+                <span class="strip-name" id="bottom-name">YOU</span>
+                <span class="strip-color-tag" id="bottom-color-tag">WHITE</span>
+                <span class="ai-thinking-tag hidden" id="bottom-thinking-tag">THINKING…</span>
+              </div>
+              <div class="strip-material-row">
+                <span class="material-tally">SCORE: <strong id="bottom-score-num">39</strong></span>
+                <span class="material-advantage-tag hidden" id="bottom-adv-tag"></span>
+                <div class="strip-captured-pieces" id="bottom-captured-pieces"></div>
+              </div>
+            </div>
+          </div>
+          <div class="strip-right">
+            <div class="digital-timer" id="bottom-clock" aria-label="Bottom Clock">
+              <span id="bottom-clock-digits">10:00</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: COMPACT EDITORIAL SIDEBAR -->
+      <aside class="sidebar-column">
+
+        <!-- DYNAMIC MATERIAL SUMMARY PANEL -->
+        <div class="editorial-card material-card">
+          <div class="card-caption">MATERIAL EVALUATION</div>
+          <div class="material-balance-display" id="material-balance-display">
+            <span class="balance-state" id="balance-state">MATERIAL EQUAL</span>
+            <span class="balance-sub" id="balance-sub">White: 39  •  Black: 39</span>
+          </div>
+          <div class="match-meta-specs">
+            <span id="spec-opponent">VS COMPUTER (HARD)</span>
+            <span id="spec-timecontrol">10 + 0 RAPID</span>
+          </div>
+        </div>
+
+        <!-- MOVE NOTATION HISTORY (Collapsible on mobile) -->
+        <div class="editorial-card history-card" id="history-card">
+          <div class="history-header" id="history-toggle-header">
+            <span class="card-caption">MOVE HISTORY</span>
+            <span class="history-ply-count" id="history-ply-count">0 MOVES</span>
+          </div>
+
+          <div class="history-table-wrapper" id="history-scroll">
+            <table class="history-table" id="history-table">
+              <thead>
+                <tr>
+                  <th class="col-num">#</th>
+                  <th class="col-san">WHITE</th>
+                  <th class="col-san">BLACK</th>
+                </tr>
+              </thead>
+              <tbody id="history-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+            <div class="empty-history-placeholder" id="empty-history-placeholder">
+              Moves will appear here as they are played.
+            </div>
+          </div>
+
+          <!-- History Review Stepper -->
+          <div class="history-stepper">
+            <button class="step-btn" id="btn-first-move" title="First move" aria-label="First move">|&lt;</button>
+            <button class="step-btn" id="btn-prev-move" title="Previous ply" aria-label="Previous ply">&lt;</button>
+            <button class="step-btn" id="btn-next-move" title="Next ply" aria-label="Next ply">&gt;</button>
+            <button class="step-btn" id="btn-last-move" title="Live move" aria-label="Live move">&gt;|</button>
+          </div>
+        </div>
+
+        <!-- CONTROLS DOCK -->
+        <div class="editorial-card controls-card">
+          <div class="controls-row-primary">
+            <button class="minimal-btn" id="btn-undo" title="Undo Move (U)">UNDO</button>
+            <button class="minimal-btn" id="btn-redo" title="Redo Move (R)">REDO</button>
+            <button class="minimal-btn" id="btn-flip" title="Flip Board (F)">FLIP</button>
+          </div>
+          <div class="controls-row-secondary">
+            <button class="minimal-btn" id="btn-draw" title="Claim / Offer Draw">DRAW</button>
+            <button class="minimal-btn danger-hover" id="btn-resign" title="Resign Match">RESIGN</button>
+            <button class="minimal-btn accent-gold" id="btn-new-game-panel" title="New Match (N)">NEW GAME</button>
+          </div>
+
+          <!-- INLINE CONFIRMATION POPOVERS -->
+          <div class="confirm-inline-bar hidden" id="bar-confirm-draw">
+            <span>OFFER DRAW?</span>
+            <div class="confirm-btn-group">
+              <button class="c-btn cancel" id="btn-draw-cancel">CANCEL</button>
+              <button class="c-btn confirm" id="btn-draw-confirm">CONFIRM</button>
+            </div>
+          </div>
+
+          <div class="confirm-inline-bar hidden" id="bar-confirm-resign">
+            <span>RESIGN GAME?</span>
+            <div class="confirm-btn-group">
+              <button class="c-btn cancel" id="btn-resign-cancel">CANCEL</button>
+              <button class="c-btn confirm danger" id="btn-resign-confirm">RESIGN</button>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+    </main>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 4. MODALS & OVERLAYS                           -->
+  <!-- ============================================== -->
+
+  <!-- MINIMAL NEW GAME SETUP -->
+  <div class="modal-scrim" id="modal-new-game" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-title-row">
+        <span class="modal-heading">NEW GAME</span>
+        <button class="close-x-btn" id="close-modal-newgame" aria-label="Close dialog">×</button>
+      </div>
+
+      <div class="modal-form">
+        <!-- Opponent selection -->
+        <div class="form-section">
+          <span class="form-legend">OPPONENT</span>
+          <div class="segmented-control" id="select-opponent">
+            <button type="button" class="seg-btn active" data-val="ai">● COMPUTER</button>
+            <button type="button" class="seg-btn" data-val="pvp">○ PLAYER</button>
+          </div>
+        </div>
+
+        <!-- AI Difficulty -->
+        <div class="form-section" id="difficulty-group">
+          <span class="form-legend">DIFFICULTY</span>
+          <div class="segmented-control wrap" id="select-difficulty">
+            <button type="button" class="seg-btn" data-val="easy">EASY</button>
+            <button type="button" class="seg-btn" data-val="medium">MEDIUM</button>
+            <button type="button" class="seg-btn" data-val="hard">HARD</button>
+            <button type="button" class="seg-btn" data-val="extreme">EXTREME</button>
+            <button type="button" class="seg-btn" data-val="master">MASTER</button>
+            <button type="button" class="seg-btn active apex-btn" data-val="apex">⚡ APEX</button>
+          </div>
+        </div>
+
+        <!-- Side selection -->
+        <div class="form-section">
+          <span class="form-legend">PLAY AS</span>
+          <div class="segmented-control" id="select-side">
+            <button type="button" class="seg-btn active" data-val="white">WHITE</button>
+            <button type="button" class="seg-btn" data-val="random">RANDOM</button>
+            <button type="button" class="seg-btn" data-val="black">BLACK</button>
+          </div>
+        </div>
+
+        <!-- Time Control selection -->
+        <div class="form-section">
+          <span class="form-legend">TIME CONTROL</span>
+          <div class="segmented-control wrap" id="select-time-control">
+            <button type="button" class="seg-btn" data-time="60" data-inc="0">1 + 0</button>
+            <button type="button" class="seg-btn" data-time="180" data-inc="2">3 + 2</button>
+            <button type="button" class="seg-btn" data-time="300" data-inc="0">5 + 0</button>
+            <button type="button" class="seg-btn active" data-time="600" data-inc="0">10 + 0</button>
+            <button type="button" class="seg-btn" data-time="900" data-inc="10">15 + 10</button>
+            <button type="button" class="seg-btn" data-time="0" data-inc="0">UNTIMED</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-action-row">
+        <button class="primary-confirm-btn" id="btn-start-game">START GAME</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME OVER OVERLAY (Clean result with VIEW MOVES button to keep board visible) -->
+  <div class="modal-scrim" id="modal-gameover" aria-hidden="true">
+    <div class="modal-box">
+      <div class="gameover-masthead">
+        <span class="gameover-kicker">MATCH CONCLUDED</span>
+        <h2 class="gameover-title" id="gameover-title">CHECKMATE</h2>
+        <div class="gameover-score" id="gameover-score">1 — 0</div>
+        <div class="gameover-verdict" id="gameover-verdict">WHITE IS VICTORIOUS</div>
+      </div>
+
+      <div class="gameover-breakdown">
+        <div class="breakdown-stat">
+          <span class="b-lbl">TOTAL MOVES</span>
+          <span class="b-val" id="go-moves">0</span>
+        </div>
+        <div class="breakdown-stat">
+          <span class="b-lbl">CAPTURES</span>
+          <span class="b-val" id="go-captures">0</span>
+        </div>
+        <div class="breakdown-stat">
+          <span class="b-lbl">CHECKS DELIVERED</span>
+          <span class="b-val" id="go-checks">0</span>
+        </div>
+        <div class="breakdown-stat">
+          <span class="b-lbl">FINAL ADVANTAGE</span>
+          <span class="b-val" id="go-material">EQUAL</span>
+        </div>
+      </div>
+
+      <div class="modal-action-row split">
+        <button class="primary-confirm-btn" id="btn-go-newgame">NEW GAME</button>
+        <button class="secondary-btn" id="btn-go-review">VIEW MOVES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME SELECTOR -->
+  <div class="modal-scrim" id="modal-themes" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-title-row">
+        <span class="modal-heading">BOARD THEME</span>
+        <button class="close-x-btn" id="close-modal-themes" aria-label="Close dialog">×</button>
+      </div>
+      <div class="theme-list">
+        <button class="theme-row-btn active" data-theme-val="noir">
+          <div class="theme-swatch noir-swatch"></div>
+          <div class="theme-text">
+            <strong>NOIR</strong>
+            <span>Warm ivory & deep charcoal slate</span>
+          </div>
+        </button>
+        <button class="theme-row-btn" data-theme-val="ivory">
+          <div class="theme-swatch ivory-swatch"></div>
+          <div class="theme-text">
+            <strong>IVORY & WALNUT</strong>
+            <span>Muted cream & aged luxury walnut</span>
+          </div>
+        </button>
+        <button class="theme-row-btn" data-theme-val="emerald">
+          <div class="theme-swatch emerald-swatch"></div>
+          <div class="theme-text">
+            <strong>EMERALD</strong>
+            <span>Forest jade & warm parchment</span>
+          </div>
+        </button>
+        <button class="theme-row-btn" data-theme-val="classic">
+          <div class="theme-swatch classic-swatch"></div>
+          <div class="theme-text">
+            <strong>CLASSIC TOURNAMENT</strong>
+            <span>Traditional maple & oak</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATCH ARCHIVE / RECORDS -->
+  <div class="modal-scrim" id="modal-past-games" aria-hidden="true">
+    <div class="modal-box wide">
+      <div class="modal-title-row">
+        <span class="modal-heading">MATCH RECORDS</span>
+        <button class="close-x-btn" id="close-modal-pastgames" aria-label="Close dialog">×</button>
+      </div>
+      <div class="archive-container" id="past-games-list"></div>
+      <div class="empty-archive-msg" id="empty-archive-msg">No recorded matches found. Completed matches will appear here.</div>
+      <div class="modal-action-row right">
+        <button class="secondary-btn danger" id="btn-clear-archive">CLEAR RECORDS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEYBOARD SHORTCUTS -->
+  <div class="modal-scrim" id="modal-shortcuts" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-title-row">
+        <span class="modal-heading">KEYBOARD SHORTCUTS</span>
+        <button class="close-x-btn" id="close-modal-shortcuts" aria-label="Close dialog">×</button>
+      </div>
+      <div class="shortcuts-table">
+        <div class="shortcut-line"><span>New Game</span><kbd>N</kbd></div>
+        <div class="shortcut-line"><span>Flip Board</span><kbd>F</kbd></div>
+        <div class="shortcut-line"><span>Undo Move</span><kbd>U</kbd></div>
+        <div class="shortcut-line"><span>Redo Move</span><kbd>R</kbd></div>
+        <div class="shortcut-line"><span>Sound On / Off</span><kbd>M</kbd></div>
+        <div class="shortcut-line"><span>Step Backward in History</span><kbd>←</kbd></div>
+        <div class="shortcut-line"><span>Step Forward in History</span><kbd>→</kbd></div>
+        <div class="shortcut-line"><span>Close Any Window</span><kbd>Esc</kbd></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="apex-engine.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
