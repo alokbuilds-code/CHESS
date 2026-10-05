@@ -1,4 +1,4 @@
-# ♟️ NOIR CHESS & THE APEX ENGINE
+# ♟️  CHESS & THE APEX ENGINE
 
 > **A cinematic, luxury editorial chess experience powered by the high-performance, browser-native APEX grandmaster engine.**
 
@@ -8,7 +8,10 @@
 [![Responsive & Mobile Ready](https://img.shields.io/badge/Design-Responsive%20%26%20Touch-blueviolet?style=flat)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey?style=flat)](#)
 
----
+
+https://chess-beta-rust.vercel.app/
+
+
 
 ## 🌟 Executive Summary
 
